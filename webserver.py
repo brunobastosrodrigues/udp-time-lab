@@ -43,7 +43,7 @@ HTML_TEMPLATE = """
     </script>
 </head>
 <body>
-    <h1>Distributed Systems Lab Dashboard</h1>
+    <h1>Distributed Systems Example</h1>
     
     <div class="dashboard">
         <h2>Active Services</h2>
