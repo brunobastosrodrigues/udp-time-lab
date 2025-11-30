@@ -136,7 +136,6 @@ def home():
                     status_class = "status-success"
                     
                 except socket.timeout:
-                    # Slide 19: Handling Partial Failures
                     status_message = f"⚠️ CRITICAL ERROR: Server Request Timed Out ({TIMEOUT_SECONDS}s)"
                     status_class = "status-error"
                 except Exception as e:
