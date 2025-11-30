@@ -1,37 +1,48 @@
 version: '3.8'
 
 services:
-  # 1. The Time Server
-  udp-server:
+  # 1. UDP Backend (Matches Slide 33 & 35)
+  udp-backend:
     build: .
-    container_name: time_server_container
-    command: python udp_server.py
+    container_name: udp_backend_container
+    command: python udp-backend.py
     ports:
       - "5678:5678/udp"
     networks:
       - lab_network
 
-  # 2. The Time Client Web Interface
+  # 2. Web Client (Matches Slide 34)
   udp-client:
     build: .
-    container_name: time_client_container
-    command: python udp_client.py
+    container_name: udp_client_container
+    command: python udp-client.py
     ports:
       - "5001:5001"
     environment:
-      - SERVER_IP=udp-server
+      # This tells the client to look for the container named 'udp-backend'
+      - SERVER_IP=udp-backend
     depends_on:
-      - udp-server
+      - udp-backend
     networks:
       - lab_network
 
-  # 3. NEW: The File Browser
+  # 3. File Browser (Matches Slide 30)
   file-browser:
     build: .
     container_name: file_browser_container
     command: python webserver.py
     ports:
-      - "5000:5000"  # Exposing port 5000
+      - "5000:5000"
+    networks:
+      - lab_network
+
+  # 4. Simple Time Server (Matches Slide 31)
+  simple-time-server:
+    build: .
+    container_name: simple_time_container
+    command: python timeserver.py
+    ports:
+      - "5002:5000" # Mapped to 5002 to avoid conflict with File Browser
     networks:
       - lab_network
 
