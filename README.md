@@ -107,5 +107,3 @@ To stop the containers and free up ports, press `Ctrl+C` in your terminal, or ru
 docker compose down
 ```
 
-```
-```
