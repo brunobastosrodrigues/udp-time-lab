@@ -8,39 +8,35 @@ app = Flask(__name__)
 BASE_DIR = os.getcwd()
 
 # Extended Configuration for the Dashboard
-# Added 'role', 'protocol', and 'slide' to help students connect dots
+# Removed 'slide' references
 LAB_SERVICES = [
     {
         "name": "File Browser (This Page)",
         "port": 5000,
         "role": "Tool",
         "protocol": "HTTP",
-        "desc": "Navigates the code files inside the container.",
-        "slide": "Slide 30"
+        "desc": "Navigates the code files inside the container."
     },
     {
         "name": "Simple Time Server",
         "port": 5002,
         "role": "Server",
         "protocol": "HTTP (REST)",
-        "desc": "A basic API returning time directly to the browser.",
-        "slide": "Slide 31"
+        "desc": "A basic API returning time directly to the browser."
     },
     {
         "name": "UDP Web Client",
         "port": 5001,
         "role": "Client / Frontend",
         "protocol": "HTTP + UDP",
-        "desc": "The User Interface that talks to the Backend.",
-        "slide": "Slide 34"
+        "desc": "The User Interface that talks to the Backend."
     },
     {
         "name": "UDP Backend Server",
         "port": 5678,
         "role": "Backend Server",
         "protocol": "UDP",
-        "desc": "Internal time source. Does not have a web page.",
-        "slide": "Slide 33"
+        "desc": "Internal time source. Does not have a web page."
     }
 ]
 
@@ -48,7 +44,7 @@ HTML_TEMPLATE = """
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Distributed Systems Lab Dashboard</title>
+    <title>Distributed Systems Example</title>
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({startOnLoad:true});</script>
     
@@ -92,7 +88,7 @@ HTML_TEMPLATE = """
     
     <script>
         // JS hack to inject current Host IP into links
-        function writeLink(port, text, role, protocol, desc, slide) {
+        function writeLink(port, text, role, protocol, desc) {
             var host = window.location.hostname;
             var url = "http://" + host + ":" + port;
             
@@ -104,7 +100,6 @@ HTML_TEMPLATE = """
                 <a href="${url}" target="_blank" class="service-title">${text} ↗</a>
                 <div style="margin-bottom: 8px;">
                     <span class="badge ${badgeClass}">${protocol}</span>
-                    <span class="badge badge-tool">${slide}</span>
                 </div>
                 <p style="font-size: 0.9em; color: #666; margin: 0;">${desc}</p>
             </div>
@@ -159,12 +154,11 @@ HTML_TEMPLATE = """
                         <span class="service-title" style="color: #7f8c8d; cursor: default;">{{ service.name }}</span>
                         <div style="margin-bottom: 8px;">
                             <span class="badge badge-udp">UDP</span>
-                            <span class="badge badge-tool">{{ service.slide }}</span>
                         </div>
                         <p style="font-size: 0.9em; color: #666; margin: 0;">Internal Only. Accessed via Client.</p>
                     </div>
                     {% else %}
-                        <script>writeLink({{ service.port }}, "{{ service.name }}", "{{ service.role }}", "{{ service.protocol }}", "{{ service.desc }}", "{{ service.slide }}");</script>
+                        <script>writeLink({{ service.port }}, "{{ service.name }}", "{{ service.role }}", "{{ service.protocol }}", "{{ service.desc }}");</script>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -174,9 +168,9 @@ HTML_TEMPLATE = """
             <h2>🎓 Lab Instructions</h2>
             <ul class="steps">
                 <li><strong>Explore the Code:</strong> Use the file browser below to look at <code>udp-client.py</code> vs <code>udp-backend.py</code>. Note the difference between <code>socket.sendto</code> (Client) and <code>socket.bind</code> (Server).</li>
-                <li><strong>Test HTTP (Slide 31):</strong> Open the <b>Simple Time Server</b>. Note that your browser talks directly to the server.</li>
-                <li><strong>Test UDP (Slide 34):</strong> Open the <b>UDP Web Client</b>. Click "Sync". Note that your browser talks to the Client, which then talks to the Backend.</li>
-                <li><strong>Simulate Failure (Slide 19):</strong> In the UDP Web Client, try the "Chaos Engineering" buttons to crash the backend and observe the timeouts.</li>
+                <li><strong>Test HTTP:</strong> Open the <b>Simple Time Server</b>. Note that your browser talks directly to the server.</li>
+                <li><strong>Test UDP:</strong> Open the <b>UDP Web Client</b>. Click "Sync". Note that your browser talks to the Client, which then talks to the Backend.</li>
+                <li><strong>Simulate Failure:</strong> In the UDP Web Client, try the "Chaos Engineering" buttons to crash the backend and observe the timeouts.</li>
             </ul>
         </div>
 
