@@ -2,30 +2,44 @@ import socket
 from datetime import datetime
 import os
 
-# UDP Server Configuration
-# In Docker, we MUST listen on 0.0.0.0 to receive traffic from outside the container
-IPaddress = "0.0.0.0" 
+# Configuration
+IPaddress = "0.0.0.0"
 portNumber = 5678
 bufferSize = 1024
 
-# Create a UDP socket
+# STATE VARIABLE: Controls if the server is "Simulating a Crash"
+is_server_healthy = True
+
 UDPServerSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 UDPServerSocket.bind((IPaddress, portNumber))
 
-print(f"UDP Time Server is running on {IPaddress}:{portNumber}")
+print(f"UDP Time Server running on {IPaddress}:{portNumber}")
+print("Waiting for requests...")
 
 while True:
-    # Listen for incoming messages
     message, clientAddress = UDPServerSocket.recvfrom(bufferSize)
     decoded_message = message.decode()
 
-    if decoded_message == "REQUEST_TIME":
-        # Get the current server timestamp
-        current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-        print(f"Received request from {clientAddress}, responding with time: {current_time}")
+    # --- ADMIN COMMANDS (To simulate failures) ---
+    if decoded_message == "ADMIN_CRASH":
+        is_server_healthy = False
+        print(f"[ADMIN] Simulation Mode: CRASHED (Ignoring requests from {clientAddress})")
+        # We don't reply, just acknowledge in logs
         
-        # Send the timestamp back to the client
-        UDPServerSocket.sendto(current_time.encode(), clientAddress)
+    elif decoded_message == "ADMIN_REPAIR":
+        is_server_healthy = True
+        print(f"[ADMIN] Simulation Mode: REPAIRED (Resuming normal service)")
+
+    # --- STANDARD CLIENT REQUESTS ---
+    elif decoded_message == "REQUEST_TIME":
+        if is_server_healthy:
+            # Normal behavior: Send time
+            current_time = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+            print(f"Request from {clientAddress} -> Responded: {current_time}")
+            UDPServerSocket.sendto(current_time.encode(), clientAddress)
+        else:
+            # Crashed behavior: DO NOTHING (Simulates a dropped packet or dead server)
+            print(f"Request from {clientAddress} -> IGNORED (Simulated Crash)")
+    
     else:
-        # Respond with an error message for invalid requests
         UDPServerSocket.sendto("INVALID_REQUEST".encode(), clientAddress)
