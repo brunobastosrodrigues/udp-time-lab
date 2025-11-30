@@ -1,31 +1,40 @@
 version: '3.8'
 
 services:
-  # The Time Server Container
+  # 1. The Time Server
   udp-server:
     build: .
     container_name: time_server_container
     command: python udp_server.py
     ports:
-      - "5678:5678/udp"  # Expose UDP port
+      - "5678:5678/udp"
     networks:
       - lab_network
 
-  # The Web Client Container
+  # 2. The Time Client Web Interface
   udp-client:
     build: .
     container_name: time_client_container
     command: python udp_client.py
     ports:
-      - "5001:5001"  # Expose Web Interface
+      - "5001:5001"
     environment:
-      - SERVER_IP=udp-server  # Tells client to look for the container named 'udp-server'
+      - SERVER_IP=udp-server
     depends_on:
       - udp-server
     networks:
       - lab_network
 
-# Create a custom internal network for them to talk
+  # 3. NEW: The File Browser
+  file-browser:
+    build: .
+    container_name: file_browser_container
+    command: python webserver.py
+    ports:
+      - "5000:5000"  # Exposing port 5000
+    networks:
+      - lab_network
+
 networks:
   lab_network:
     driver: bridge
